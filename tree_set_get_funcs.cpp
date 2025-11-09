@@ -32,7 +32,6 @@ int  GetData(const struct Node* node)
 struct Node* GetRoot(const struct Tree* tree)
 {
     assert(tree);
-
     return tree->root;
 }
 

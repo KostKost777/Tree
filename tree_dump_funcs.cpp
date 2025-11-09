@@ -5,12 +5,71 @@
 #include "tree_set_get_funcs.h"
 #include "tree_dump_funcs.h"
 
+int TreeVerifier(struct Tree* tree)
+{
+    assert(tree);
+
+    if (tree->size < 0)
+        tree->code_err |= BAD_SIZE;
+
+    if (GetRoot(tree) == NULL)
+        return tree->code_err;
+
+    bool is_correct = true;
+
+    CheckTreeSorted(GetRoot(tree), &is_correct);
+
+    if( !is_correct )
+        tree->code_err |= BAD_SORT;
+
+    return tree->code_err;
+}
+
+void CheckTreeSorted(struct Node* node, bool* is_correct)
+{
+    assert(node);
+    assert(is_correct);
+
+    if (GetLeft(node)) {
+
+        if (GetData(GetLeft(node)) > GetData(node))
+            *is_correct = false;
+
+        CheckTreeSorted(GetLeft(node), is_correct);
+
+    }
+
+    if (GetRight(node)) {
+
+        if (GetData(GetRight(node)) < GetData(node))
+            *is_correct = false;
+
+        CheckTreeSorted(GetRight(node), is_correct);
+
+    }
+
+}
+
+void PrintNameOfErrors(int code_err)
+{
+    if (code_err & BAD_SORT)
+        fprintf(log_file, "<h3>BAD_SORT - [%d]</h3>\n", BAD_SORT);
+
+    if (code_err & BAD_SIZE)
+        fprintf(log_file, "<h3>BAD_SIZE - [%d]</h3>\n", BAD_SIZE);
+}
+
 void TreeDump(struct Tree* tree,
               const int line, const char* func, const char* file)
 {
     assert(tree);
 
+    if (tree->code_err != 0)
+        PrintNameOfErrors(tree->code_err);
+
     fprintf(log_file, "<h3>TREE { %s %s:%d }</h3>", func, file, line);
+
+    fprintf(log_file, "<h3>SIZE: %d\n</h3>", GetSize(tree));
 
     static int file_counter = 0;
     char* image_file_name = GetNewImageFileName(file_counter);
@@ -25,6 +84,7 @@ void TreeDump(struct Tree* tree,
     if (GetSize(tree) > 0) {
 
         PrintBazeEdge(graphiz_file, tree);
+        //printf("PTR ROOT: %p \n", GetRoot(tree));
         PrintTree(GetRoot(tree), graphiz_file);
     }
 
@@ -49,7 +109,7 @@ void PrintTree(const struct Node* node, FILE* graphiz_file)
     assert(node);
     assert(graphiz_file);
 
-    printf("(");
+    //printf("(");
 
     PrintGraphizNode(graphiz_file, node);
     PrintGraphizEdge(graphiz_file, node);
@@ -57,12 +117,12 @@ void PrintTree(const struct Node* node, FILE* graphiz_file)
     if (GetLeft(node))
         PrintTree(GetLeft(node), graphiz_file);
 
-    printf("%d", GetData(node));
+    //printf("%d", GetData(node));
 
     if (GetRight(node))
         PrintTree(GetRight(node), graphiz_file);
 
-    printf(")");
+    //printf(")");
 
 }
 

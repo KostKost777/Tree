@@ -16,7 +16,7 @@ int main()
     struct Node* ret_value = NULL;
     struct Tree tree = {};
 
-    struct Node* node_7 = NULL;
+    struct Node* node_20 = NULL;
 
     INSERT(&tree, 10, exit_label);
 
@@ -24,7 +24,7 @@ int main()
 
     INSERT(&tree, 20, exit_label);
 
-    node_7 = ret_value;
+    node_20 = ret_value;
 
     INSERT(&tree, 3, exit_label);
 
@@ -36,9 +36,13 @@ int main()
 
     INSERT(&tree, 16, exit_label);
 
-    printf("PTR: %p\n", node_7);
+    //printf("\n\nSIZE: %d\n\n", tree.size);
 
-    DeleteNode(node_7);
+    DELETE_BRANCH(&tree, node_20, LEFT, exit_label);
+
+   // printf("\n\nSIZE: %d\n\n", tree.size);
+
+    //printf("\n\nPTR: %p\n\n", node_20->left);
 
     TreeDump(&tree, __LINE__, __func__, __FILE__);
 

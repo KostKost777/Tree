@@ -17,7 +17,14 @@ struct Node
 struct Tree
 {
     int size;
+    int code_err;
     struct Node* root;
+};
+
+enum Son
+{
+    LEFT = 0,
+    RIGHT = 1
 };
 
 extern FILE* log_file;
@@ -26,7 +33,10 @@ void CloseLogFile();
 
 void OpenLogFile(const char* log_file_name);
 
-void DeleteNode(struct Node* node);
+void DeleteNode(struct Tree* tree, struct Node* node);
+
+struct Node* DeleteBranch(struct Tree* tree, struct Node* node, enum Son son,
+                          const int line, const char* func, const char* file);
 
 enum Status NodeCtor(struct Node** node, int data);
 
@@ -35,7 +45,7 @@ struct Node* Insert(struct Tree* tree, int value,
 
 void TreeDtor(struct Tree* tree);
 
-void NodeDtor(struct Node* node);
+void CheckTreeSorted(struct Node* node, bool* is_correct);
 
 #define INSERT(tree, value, exit_label)                                          \
     if ((ret_value = Insert(tree, value, __LINE__, __func__, __FILE__)) == NULL) {       \
@@ -44,10 +54,11 @@ void NodeDtor(struct Node* node);
         goto exit_label;                                                         \
     }
 
-#define PRINT_DUMP_LOG(tree, message, value)        \
-        fprintf(log_file, message, value);          \
-        TreeDump(tree, line, func, file);                                                                          \
-
-
+#define DELETE_BRANCH(tree, node, son, exit_label)                                          \
+    if (DeleteBranch(tree, node, son, __LINE__, __func__, __FILE__)) {       \
+        TreeDump(tree, __LINE__, __func__, __FILE__);                            \
+        printf("Ошибка\n");                                                       \
+        goto exit_label;                                                         \
+    }
 
 #endif
